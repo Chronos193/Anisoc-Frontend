@@ -1,0 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
+@import "tailwindcss";
+
+@layer utilities {
+  .font-nunito {
+    font-family: "Nunito", system-ui, sans-serif;
+  }
+
+  .font-jp {
+    font-family: "Noto Sans JP", system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  html,
+  body {
+    @apply bg-[#080808] m-0 p-0;
+  }
+}
