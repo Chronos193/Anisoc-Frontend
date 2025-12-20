@@ -1,5 +1,7 @@
 import React from "react";
 import logo from '../icons/logo.webp'
+import { Link } from "react-router-dom";
+
 
 const Nav = () => {
   return (
@@ -19,22 +21,25 @@ const Nav = () => {
 
         <ul className="hidden lg:flex items-center gap-8 text-lg font-semibold">
           {[
-            "Home",
-            "About",
-            "Events",
-            "Gallery",
-            "FanFiction",
-            "Blog",
+            { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
+            { name: "Events", path: "/events" },
+            { name: "Gallery", path: "/gallery" },
+            { name: "FanFiction", path: "/fanfiction" },
+            { name: "Blog", path: "/blog" },
           ].map((item) => (
             <li
-              key={item}
+              key={item.name}
               className="relative cursor-pointer text-gray-200 hover:text-white transition-all duration-300 group"
             >
-              {item}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+              <Link to={item.path}>
+                {item.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+              </Link>
             </li>
           ))}
         </ul>
+
 
         <div className="md:hidden text-white text-3xl cursor-pointer">
           ☰

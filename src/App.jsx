@@ -1,20 +1,25 @@
 import { useState } from 'react'
-import { BrowserRouter, Route, Routes, Navigate} from 'react-router-dom'
-import ProtectedRoutes from './components/Protected_Routes'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from './pages/Home'
-function App() {
-  const [count, setCount] = useState(0)
+import About from './pages/About'
+import Nav from './components/Nav'
+import Footer from './components/Footer'
+import Events from './pages/Events'
+import EventDetail from './pages/EventDetail'
 
+function App() {
   return (
     <BrowserRouter>
-    <Routes>
-        <Route 
-        path='/'
-        element = {
-            <Home />
-        }
-        />
-    </Routes>
+      <Nav />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/events/:id" element={<EventDetail />} />
+      </Routes>
+
+      <Footer />
     </BrowserRouter>
   )
 }

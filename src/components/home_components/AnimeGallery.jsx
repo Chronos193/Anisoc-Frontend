@@ -47,7 +47,7 @@ const GenreSection = ({ title, images, accent }) => {
 
 const AnimeGallery = () => {
   const placeholder = [
-    "https://images.placeholder.com/400x400",
+    "https://laughingsquid.com/wp-content/uploads/2013/09/beautiful-high-definition-animation-of-the-moons-rotation-captured-by-nasas-lunar-reconnaissance-orbiter.jpg",
     "https://images.placeholder.com/800x400",
     "https://images.placeholder.com/800x400",
     "https://images.placeholder.com/400x400",
