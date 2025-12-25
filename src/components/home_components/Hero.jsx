@@ -1,8 +1,21 @@
 import React from "react";
 import bgMedia from "../../assets/accelerator.mp4"; 
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const isVideo = bgMedia.endsWith(".mp4") || bgMedia.endsWith(".webm");
+  const navigate = useNavigate()
+
+  const handleClick = async() => {
+    try
+    {
+      await navigate("/events")
+    }
+    catch
+    {
+      console.log("Events Redirect failed")
+    }
+  }
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-black">
@@ -44,7 +57,7 @@ const Hero = () => {
           and celebrate everything otaku.
         </p>
 
-        <button className="px-10 py-4 bg-linear-to-r from-orange-500 to-red-600 rounded-full text-lg font-bold hover:scale-105 transition-all duration-300 shadow-xl shadow-orange-600/30">
+        <button onClick={handleClick} className="px-10 py-4 bg-linear-to-r from-orange-500 to-red-600 rounded-full text-lg font-bold hover:scale-105 transition-all duration-300 shadow-xl shadow-orange-600/30">
           View Our Events
         </button>
       </div>
