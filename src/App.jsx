@@ -17,6 +17,9 @@ import ProtectedRoutes from './components/Protected_Routes'
 import FanFictionMetaCreatePage from './pages/FanFictionMetaCreatePage'
 import FanFictionMetaEditPage from './pages/FanFictionMetaEditPage'
 import ChapterStudioPage from './pages/ChapterStudioPage'
+import BlogPostDetailPage from './pages/BlogPostDetailPage'
+import BlogListPage from './pages/BlogListPage'
+import BlogCreatePage from './pages/BlogCreatePage'
 function App() {
   return (
     <BrowserRouter>
@@ -62,7 +65,10 @@ function App() {
             </ProtectedRoutes>
           }
         />
-        
+        {/* Blogs */}
+        <Route path="/blog" element={<BlogListPage />} />
+        <Route path="/blog/new" element={<BlogCreatePage />} />
+        <Route path="/blog/:id" element={<BlogPostDetailPage />} />
       </Routes>
 
       <Footer />
