@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FaPenNib, FaRss } from "react-icons/fa"; // Ensure react-icons is installed
 import api from "../api";
 import BlogPostCard from "../components/blog/BlogPostCard";
-import { useNavigate } from "react-router-dom";
 
 const BlogListPage = () => {
   const [posts, setPosts] = useState([]);
@@ -11,55 +13,120 @@ const BlogListPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get("/blog-posts/")
-      .then(res => setPosts(res.data.results || res.data))
-      .finally(() => setLoading(false));
+    const fetchData = async () => {
+      try {
+        const postsRes = await api.get("/blog-posts/");
+        setPosts(postsRes.data.results || postsRes.data);
 
-    api.get("/auth/me/")
-      .then(res => setUser(res.data))
-      .catch(() => setUser(null));
+        // Fetch user separately (don't block posts if this fails)
+        try {
+          const userRes = await api.get("/auth/me/");
+          setUser(userRes.data);
+        } catch (e) {
+          setUser(null);
+        }
+      } catch (err) {
+        console.error("Failed to load blog data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center ">
-        Loading blog posts…
+      <div className="min-h-screen w-full bg-black flex flex-col items-center justify-center gap-4">
+        <div className="w-12 h-12 border-4 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+        <p className="text-orange-400 font-mono text-sm animate-pulse">Loading Articles...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-20 mt-10">
-      <div className="max-w-5xl mx-auto space-y-10">
+    <div className="min-h-screen w-full bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white py-24 px-6 relative overflow-hidden">
+      
+      {/* Background Ambience */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/3 w-[500px] h-[500px] bg-orange-600/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full" />
+      </div>
 
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-orange-400">
-            Blog
-          </h1>
+      <div className="relative z-10 max-w-7xl mx-auto">
 
-          <button
+        {/* 1. Header & Actions */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
+          
+          {/* Title Section */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-2">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-pink-500">
+                Community Blog
+              </span>
+            </h1>
+            <p className="text-gray-400 text-lg flex items-center gap-2">
+              <FaRss className="text-orange-500/50" />
+              Reviews, theories, and deep dives from the AniSoc team.
+            </p>
+          </motion.div>
+
+          {/* Action Button */}
+          <motion.button
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             onClick={() => {
               if (!user) navigate("/login");
               else navigate("/blog/new");
             }}
-            className="px-6 py-2 rounded-full bg-orange-500 font-semibold hover:scale-105 transition"
+            className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-full text-lg font-bold text-white shadow-lg shadow-orange-600/20 hover:shadow-orange-600/40 hover:scale-105 transition-all duration-300"
           >
-            Write Blog
-          </button>
+            <FaPenNib />
+            <span>Write Article</span>
+          </motion.button>
         </div>
 
-        {posts.length === 0 && (
-          <p className="text-zinc-500">
-            No blog posts yet.
-          </p>
+        {/* 2. Blog Grid */}
+        {posts.length === 0 ? (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-20 border border-white/10 rounded-2xl bg-white/5 border-dashed"
+          >
+            <p className="text-xl text-gray-500">No articles published yet.</p>
+            <p className="text-sm text-gray-600 mt-2">Be the first to write something!</p>
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: { staggerChildren: 0.1 }
+              }
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {posts.map((post) => (
+              <motion.div 
+                key={post.id}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  show: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+                }}
+              >
+                <BlogPostCard post={post} />
+              </motion.div>
+            ))}
+          </motion.div>
         )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {posts.map(post => (
-            <BlogPostCard key={post.id} post={post} />
-          ))}
-        </div>
 
       </div>
     </div>

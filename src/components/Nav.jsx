@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import logo from "../icons/logo.webp";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaBars, FaTimes, FaSignOutAlt, FaUserCircle } from "react-icons/fa"; // npm install react-icons
 import api from "../api";
+import logo from "../icons/logo.webp";
 
 const Nav = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Hook to detect current page
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Auth check (used for login + page load)
+  // 1. Auth Check
   const checkAuth = async () => {
     try {
       await api.get("/auth/me/");
@@ -18,26 +24,28 @@ const Nav = () => {
     }
   };
 
-  // On mount
   useEffect(() => {
     checkAuth();
-  }, []);
-
-  // Listen ONLY for login
-  useEffect(() => {
+    // Listen for custom event if you use it elsewhere
     const handler = () => checkAuth();
     window.addEventListener("auth-changed", handler);
     return () => window.removeEventListener("auth-changed", handler);
   }, []);
 
+  // 2. Scroll Detection Logic
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const handleLogout = async () => {
     try {
       await api.post("/auth/logout/");
-
-      // ✅ immediately update UI
       setIsAuthenticated(false);
       setShowLogoutModal(true);
-
       setTimeout(() => {
         setShowLogoutModal(false);
         navigate("/");
@@ -47,52 +55,81 @@ const Nav = () => {
     }
   };
 
+  // Helper to check active state
+  const isActive = (path) => location.pathname === path;
+
+  // Nav Links Configuration
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Events", path: "/events" },
+    { name: "Gallery", path: "/analysis" },
+    { name: "FanFiction", path: "/fanfiction" },
+    { name: "Blog", path: "/blog" },
+  ];
+
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b ${
+          isScrolled 
+            ? "bg-black/80 backdrop-blur-md border-white/10 py-4 shadow-lg" 
+            : "bg-transparent border-transparent py-6"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           
           {/* Logo */}
-          <div className="flex items-center gap-4 cursor-pointer">
-            <img
-              src={logo}
-              alt="AniSoc Logo"
-              className="h-12 w-12 rounded-full ring-2 ring-orange-500/50"
-            />
-            <span className="text-2xl font-bold italic text-white">
-              AniSoc <span className="text-orange-500 text-sm not-italic">IITK</span>
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-red-600 rounded-full blur opacity-0 group-hover:opacity-50 transition duration-500" />
+              <img
+                src={logo}
+                alt="AniSoc Logo"
+                className="relative h-10 w-10 md:h-12 md:w-12 rounded-full ring-2 ring-white/10 group-hover:ring-orange-500 transition-all"
+              />
+            </div>
+            <span className="text-xl md:text-2xl font-bold italic text-white tracking-tight">
+              AniSoc <span className="text-orange-500 text-sm not-italic font-normal">IITK</span>
             </span>
-          </div>
+          </Link>
 
-          {/* Links */}
-          <ul className="hidden lg:flex items-center gap-10 text-[17px] font-semibold font-nunito tracking-wide">
-            {[
-              { name: "Home", path: "/" },
-              { name: "About", path: "/about" },
-              { name: "Events", path: "/events" },
-              { name: "Gallery", path: "/analysis" },
-              { name: "FanFiction", path: "/fanfiction" },
-              { name: "Blog", path: "/blog" },
-            ].map(item => (
-              <li key={item.name} className="text-gray-200 hover:text-white hover:underline hover:underline-offset-8 hover:decoration-orange-500 hover:decoration-2">
-                <Link to={item.path}>{item.name}</Link>
+          {/* Desktop Links */}
+          <ul className="hidden lg:flex items-center gap-8 text-[15px] font-medium tracking-wide">
+            {navLinks.map((item) => (
+              <li key={item.name}>
+                <Link 
+                  to={item.path}
+                  className={`relative transition-colors duration-300 ${
+                    isActive(item.path) ? "text-orange-400" : "text-gray-300 hover:text-white"
+                  }`}
+                >
+                  {item.name}
+                  {/* Active Indicator Dot */}
+                  {isActive(item.path) && (
+                    <motion.div 
+                      layoutId="activeNavDot"
+                      className="absolute -bottom-2 left-1/2 w-1 h-1 bg-orange-500 rounded-full" 
+                    />
+                  )}
+                </Link>
               </li>
             ))}
           </ul>
 
-          {/* Auth Buttons */}
-          <div className="hidden lg:flex gap-4">
+          {/* Desktop Auth Buttons */}
+          <div className="hidden lg:flex items-center gap-4">
             {!isAuthenticated ? (
               <>
-                <Link
-                  to="/login"
-                  className="px-5 py-2 rounded-full border border-orange-400/40 text-orange-300 hover:bg-orange-500 hover:text-black"
-                >
+                <Link to="/login" className="text-gray-300 hover:text-white transition font-medium">
                   Login
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-5 py-2 rounded-full bg-orange-500 text-black hover:bg-orange-400"
+                  className="px-5 py-2 rounded-full bg-white text-black font-bold hover:bg-orange-500 hover:text-white transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_20px_rgba(249,115,22,0.5)]"
                 >
                   Sign Up
                 </Link>
@@ -100,26 +137,90 @@ const Nav = () => {
             ) : (
               <button
                 onClick={handleLogout}
-                className="px-5 py-2 rounded-full bg-red-500 text-white hover:bg-red-600"
+                className="flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 border border-white/10 text-white hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-400 transition-all group"
               >
-                Logout
+                <FaSignOutAlt className="group-hover:-translate-x-1 transition-transform" />
+                <span>Logout</span>
               </button>
             )}
           </div>
+
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="lg:hidden text-2xl text-white"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+          </button>
         </div>
-      </nav>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 overflow-hidden"
+            >
+              <ul className="flex flex-col p-6 gap-4">
+                {navLinks.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      to={item.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`block text-lg font-medium ${
+                        isActive(item.path) ? "text-orange-400" : "text-gray-300"
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+                
+                <div className="h-px bg-white/10 my-2" />
+
+                {!isAuthenticated ? (
+                  <div className="flex flex-col gap-4">
+                    <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-300">Login</Link>
+                    <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)} className="text-orange-400 font-bold">Sign Up</Link>
+                  </div>
+                ) : (
+                  <button onClick={handleLogout} className="text-red-400 flex items-center gap-2">
+                    <FaSignOutAlt /> Logout
+                  </button>
+                )}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
 
       {/* Logout Modal */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/60">
-          <div className="bg-white/10 rounded-xl px-10 py-6 text-center">
-            <h3 className="text-xl text-white mb-2">Logged out</h3>
-            <p className="text-gray-300 text-sm">
-              You have been safely logged out.
-            </p>
+      <AnimatePresence>
+        {showLogoutModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative bg-[#111] border border-white/10 p-8 rounded-2xl text-center shadow-2xl max-w-sm w-full"
+            >
+              <div className="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <FaUserCircle />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">See you soon!</h3>
+              <p className="text-gray-400 text-sm">You have been successfully logged out.</p>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </>
   );
 };
