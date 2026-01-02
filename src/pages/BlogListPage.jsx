@@ -12,7 +12,7 @@ const BlogListPage = () => {
 
   const navigate = useNavigate();
 
-  // 1. Scroll Progress Logic
+  // Scroll Progress Logic
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -22,22 +22,25 @@ const BlogListPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // 1. Fetch Posts (Critical Content)
       try {
         const postsRes = await api.get("/blog-posts/");
         setPosts(postsRes.data.results || postsRes.data);
-
-        // Fetch user separately (don't block posts if this fails)
-        try {
-          const userRes = await api.get("/auth/me/");
-          setUser(userRes.data);
-        } catch (e) {
-          setUser(null);
-        }
       } catch (err) {
         console.error("Failed to load blog data", err);
-      } finally {
-        setLoading(false);
       }
+
+      // 2. Fetch User (Optional Context)
+      try {
+        const userRes = await api.get("/auth/me/");
+        setUser(userRes.data);
+      } catch (e) {
+        console.log("User not logged in (Guest mode)");
+        setUser(null);
+      } 
+      
+      // 3. Stop Loading (Must happen last)
+      setLoading(false);
     };
 
     fetchData();
@@ -55,24 +58,18 @@ const BlogListPage = () => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white py-16 md:py-24 px-4 md:px-6 relative overflow-hidden">
       
-      {/* 2. Scroll Progress Bar (Fixed at Top) */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 origin-left z-50"
         style={{ scaleX }}
       />
 
-      {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 md:right-1/3 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-orange-600/10 blur-[80px] md:blur-[120px] rounded-full" />
         <div className="absolute bottom-0 left-0 md:left-1/3 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-blue-600/10 blur-[80px] md:blur-[120px] rounded-full" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-
-        {/* 1. Header & Actions */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 md:gap-8 mb-12 md:mb-16">
-          
-          {/* Title Section */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -90,7 +87,6 @@ const BlogListPage = () => {
             </p>
           </motion.div>
 
-          {/* Action Button */}
           <motion.button
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -106,7 +102,6 @@ const BlogListPage = () => {
           </motion.button>
         </div>
 
-        {/* 2. Blog Grid */}
         {posts.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0 }}
