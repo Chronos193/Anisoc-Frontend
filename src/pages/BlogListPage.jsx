@@ -20,27 +20,28 @@ const BlogListPage = () => {
     restDelta: 0.001
   });
 
-  useEffect(() => {
+useEffect(() => {
     const fetchData = async () => {
-      // 1. Fetch Posts (Critical Content)
+      // 1. Fetch Posts FIRST
       try {
         const postsRes = await api.get("/blog-posts/");
         setPosts(postsRes.data.results || postsRes.data);
       } catch (err) {
-        console.error("Failed to load blog data", err);
+        console.error("Failed to load blog posts", err);
       }
 
-      // 2. Fetch User (Optional Context)
+      // 2. STOP LOADING IMMEDIATELY
+      // We don't care if the user is logged in yet. Show the posts!
+      setLoading(false);
+
+      // 3. Check User Status in the Background (Silently)
       try {
         const userRes = await api.get("/auth/me/");
         setUser(userRes.data);
       } catch (e) {
-        console.log("User not logged in (Guest mode)");
+        // Silent fail: User is just a guest
         setUser(null);
-      } 
-      
-      // 3. Stop Loading (Must happen last)
-      setLoading(false);
+      }
     };
 
     fetchData();
