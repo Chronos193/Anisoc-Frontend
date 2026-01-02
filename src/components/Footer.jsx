@@ -51,9 +51,10 @@ const Footer = () => {
             {/* Social Icons Container */}
             <div className="flex gap-4">
               <a 
-                href="#" 
+                href="https://www.instagram.com/anisociitk/" 
                 className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 hover:bg-gradient-to-br hover:from-pink-500 hover:to-orange-500 hover:border-transparent text-gray-400 hover:text-white transition-all duration-300 group"
                 aria-label="Instagram"
+                target="_blank"
               >
                 <FaInstagram className="text-xl group-hover:scale-110 transition-transform" />
               </a>

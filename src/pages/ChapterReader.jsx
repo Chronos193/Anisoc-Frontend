@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { FaArrowLeft, FaBookReader, FaCommentDots } from "react-icons/fa";
 import api from "../api";
 import CommentList from "../components/comments/CommentList";
@@ -11,6 +11,14 @@ const ChapterReader = () => {
   const navigate = useNavigate();
   const [chapter, setChapter] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // 1. Scroll Progress Logic
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   useEffect(() => {
     const fetchChapter = async () => {
@@ -51,25 +59,33 @@ const ChapterReader = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#050505] text-white py-24 px-6 relative overflow-hidden ">
+    <div className="min-h-screen w-full bg-[#050505] text-white py-12 md:py-24 px-6 relative overflow-hidden ">
       
-      {/* Subtle Background Gradient for Reading Focus */}
-      <div className="absolute inset-0 bg-linear-to-b from-gray-900 via-black to-black pointer-events-none" />
+      {/* Scroll Progress Bar (Fixed at Top) */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 origin-left z-[100]"
+        style={{ scaleX }}
+      />
 
-      {/* Navigation Bar */}
-      <div className="fixed top-0 left-0 w-full z-50 px-6 py-4 pointer-events-none mt-20">
-        <div className="max-w-5xl mx-auto flex justify-start pointer-events-auto">
+      {/* Subtle Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-black to-black pointer-events-none" />
+
+      {/* Main Content Container */}
+      <div className="relative z-10 max-w-3xl mx-auto">
+
+        {/* NEW BACK BUTTON LOCATION: 
+            Integrated directly into the page flow. 
+            No background, no borders, just clean navigation text.
+        */}
+        <div className="mb-8 md:mb-12 flex justify-start mt-15">
           <button 
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-500 hover:text-orange-400 transition-colors bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/5 "
+            className="group flex items-center gap-3 text-gray-500 hover:text-orange-400 transition-colors"
           >
-            <FaArrowLeft className="text-sm" />
-            <span className="text-sm font-medium">Back</span>
+            <FaArrowLeft className="text-sm transform group-hover:-translate-x-1 transition-transform duration-300" />
+            <span className="text-sm font-medium uppercase tracking-widest">Back to Library</span>
           </button>
         </div>
-      </div>
-
-      <div className="relative z-10 max-w-3xl mx-auto">
 
         {/* 1. Header Section */}
         <motion.div 
@@ -81,12 +97,12 @@ const ChapterReader = () => {
           <span className="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-widest text-orange-500 uppercase bg-orange-500/10 rounded-full">
             Chapter {chapter.chapter_number}
           </span>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-400 font-serif tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-400 font-serif tracking-tight leading-tight">
             {chapter.title}
           </h1>
         </motion.div>
 
-        {/* 2. Content Body (Paper/Book Feel) */}
+        {/* 2. Content Body */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -107,7 +123,7 @@ const ChapterReader = () => {
           <div className="h-px w-12 bg-white/20" />
         </div>
 
-        {/* 3. Comments Section (Glass Container) */}
+        {/* 3. Comments Section */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

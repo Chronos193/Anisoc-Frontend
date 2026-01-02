@@ -57,12 +57,12 @@ const FanFictionDetail = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white py-24 px-6 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-linear-to-b from-gray-950 via-gray-900 to-black text-white py-24 px-6 relative overflow-hidden">
       
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-600/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-orange-600/10 blur-[120px] rounded-full" />
+        <div className="absolute top-0 left-1/4 w-150 h-150 bg-purple-600/10 blur-[120px] rounded-full" />
+        <div className="absolute bottom-0 right-1/4 w-150 h-150 bg-orange-600/10 blur-[120px] rounded-full" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto">
@@ -87,11 +87,11 @@ const FanFictionDetail = () => {
             className="md:col-span-1"
           >
             <div className="relative rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-white/10 group">
-              <div className="absolute -inset-1 bg-gradient-to-tr from-orange-500 to-purple-600 opacity-20 blur-lg group-hover:opacity-30 transition duration-500" />
+              <div className="absolute -inset-1 bg-linear-to-tr from-orange-500 to-purple-600 opacity-20 blur-lg group-hover:opacity-30 transition duration-500" />
               <img
                 src={fanfic.front_page_url || FALLBACK_IMAGE}
                 alt={fanfic.title}
-                className="relative w-full h-auto object-cover aspect-[2/3]"
+                className="relative w-full h-auto object-cover aspect-2/3"
               />
             </div>
           </motion.div>
@@ -103,7 +103,7 @@ const FanFictionDetail = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="md:col-span-2 flex flex-col justify-center"
           >
-            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-red-500 mb-4 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-orange-400 via-pink-500 to-red-500 mb-4 leading-tight">
               {fanfic.title}
             </h1>
 
@@ -135,7 +135,7 @@ const FanFictionDetail = () => {
         >
           <div className="flex items-center gap-4 mb-8">
             <h2 className="text-3xl font-bold text-white">Table of Contents</h2>
-            <div className="h-px flex-grow bg-gradient-to-r from-white/10 to-transparent" />
+            <div className="h-px grow bg-linear-to-r from-white/10 to-transparent" />
             <span className="text-gray-500 text-sm font-mono">{chapters.length} Chapters</span>
           </div>
 

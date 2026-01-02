@@ -10,7 +10,7 @@ const FALLBACK_POSTER = "/analysis-cover.jpg";
 /* ✅ CUSTOM MARKDOWN STYLING */
 const markdownComponents = {
   h1: ({ children }) => (
-    <h1 className="text-3xl md:text-4xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500 border-b border-white/10 pb-4">
+    <h1 className="text-3xl md:text-4xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-linear-to-r from-orange-400 to-red-500 border-b border-white/10 pb-4">
       {children}
     </h1>
   ),
@@ -129,11 +129,11 @@ const SeasonalDetail = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white py-24 px-6 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-linear-to-b from-gray-950 via-gray-900 to-black text-white py-24 px-6 relative overflow-hidden">
       
       {/* Background Ambience */}
-      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-orange-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-150 h-150 bg-orange-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-150 h-150 bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl mx-auto">
         
@@ -185,10 +185,10 @@ const SeasonalDetail = () => {
           <img
             src={report.poster_url || FALLBACK_POSTER}
             alt={report.title}
-            className="w-full max-h-[500px] object-cover"
+            className="w-full max-h-125 object-cover"
           />
           {/* subtle gradient at bottom of image */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black via-transparent to-transparent opacity-60" />
         </motion.div>
 
         {/* Main Content */}

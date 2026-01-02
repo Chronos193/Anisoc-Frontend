@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import api from "../api";
 import TeamSection from "../components/about_components/TeamSection";
 
@@ -19,6 +19,14 @@ const About = () => {
     fetchTeamMembers();
   }, []);
 
+  const { scrollYProgress } = useScroll();
+
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness : 100,
+    damping : 30,
+    restDelta : 0.001
+  }) 
+
   const coordinators = members.filter(
     (m) => m.is_active && m.role === "Coordinator"
   );
@@ -32,11 +40,17 @@ const About = () => {
   );
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white py-24 px-6 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-linear-to-b from-gray-950 via-gray-900 to-black text-white py-24 px-6 relative overflow-hidden">
       
+      {/* 4. The Scroll Progress Bar Element */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left z-50"
+        style={{ scaleX }}
+      />
+
       {/* 1. Ambient Background Glow (Consistent with Home Page) */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-900/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-125 h-125 bg-purple-900/10 blur-[100px] rounded-full pointer-events-none" />
 
       {/* 2. Main Header Section */}
       <section className="relative max-w-4xl mx-auto text-center mb-24 z-10">
@@ -46,7 +60,7 @@ const About = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-purple-400 to-pink-400">
               About AniSoc
             </span>
           </h1>
