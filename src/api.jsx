@@ -53,8 +53,9 @@ api.interceptors.response.use(
     // Only handle 401 errors
     if (
       error.response?.status === 401 &&
-      !originalRequest._retry
-    ) 
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/login") // <--- Letting invalid password requests fall.
+    )
     {
       originalRequest._retry = true;
 

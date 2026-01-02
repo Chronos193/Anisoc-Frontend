@@ -85,7 +85,7 @@ const Nav = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-red-600 rounded-full blur opacity-0 group-hover:opacity-50 transition duration-500" />
+              <div className="absolute -inset-1 bg-linear-to-r from-orange-500 to-red-600 rounded-full blur opacity-0 group-hover:opacity-50 transition duration-500" />
               <img
                 src={logo}
                 alt="AniSoc Logo"
@@ -199,7 +199,7 @@ const Nav = () => {
       {/* Logout Modal */}
       <AnimatePresence>
         {showLogoutModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="fixed inset-0 z-100 flex items-center justify-center px-4">
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 

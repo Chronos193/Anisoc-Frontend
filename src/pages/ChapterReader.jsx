@@ -54,14 +54,14 @@ const ChapterReader = () => {
     <div className="min-h-screen w-full bg-[#050505] text-white py-24 px-6 relative overflow-hidden ">
       
       {/* Subtle Background Gradient for Reading Focus */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-black to-black pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-b from-gray-900 via-black to-black pointer-events-none" />
 
       {/* Navigation Bar */}
-      <div className="fixed top-0 left-0 w-full z-50 px-6 py-4 pointer-events-none">
+      <div className="fixed top-0 left-0 w-full z-50 px-6 py-4 pointer-events-none mt-20">
         <div className="max-w-5xl mx-auto flex justify-start pointer-events-auto">
           <button 
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-500 hover:text-orange-400 transition-colors bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/5 mt-20"
+            className="flex items-center gap-2 text-gray-500 hover:text-orange-400 transition-colors bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/5 "
           >
             <FaArrowLeft className="text-sm" />
             <span className="text-sm font-medium">Back</span>
