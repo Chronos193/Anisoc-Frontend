@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
+import { motion } from "framer-motion";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -9,6 +10,9 @@ const Signup = () => {
     email: "",
     password: "",
   });
+  
+  // New State for Loading
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -21,12 +25,29 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true); // 1. Start Loading
 
     try {
       await api.post("/auth/register/", formData);
+      // Optional: You could show a "Success" message here before navigating
       navigate("/login");
     } catch (err) {
-      setError("Signup failed. Check inputs.");
+      console.error("Signup Error:", err);
+      
+      // 2. Smart Error Extraction
+      // Django returns errors like: { "password": ["Too common"], "username": ["Taken"] }
+      if (err.response && err.response.data) {
+        // Grab the first error message from the object
+        const firstErrorKey = Object.keys(err.response.data)[0];
+        const errorMessage = err.response.data[firstErrorKey][0];
+        
+        // Make it readable (e.g., "Password: This password is too common.")
+        setError(`${firstErrorKey.charAt(0).toUpperCase() + firstErrorKey.slice(1)}: ${errorMessage}`);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false); // 3. Stop Loading (always runs)
     }
   };
 
@@ -50,10 +71,13 @@ const Signup = () => {
           Create your account
         </p>
 
+        {/* Dynamic Error Message */}
         {error && (
-          <p className="text-red-400 text-sm text-center mb-4">
-            {error}
-          </p>
+          <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 mb-4">
+             <p className="text-red-400 text-sm text-center font-medium">
+               {error}
+             </p>
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -64,9 +88,11 @@ const Signup = () => {
             value={formData.username}
             onChange={handleChange}
             required
+            disabled={loading} // Disable input while loading
             className="w-full px-4 py-3 rounded-lg bg-black/40 
                        border border-white/10 text-white placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                       focus:outline-none focus:ring-2 focus:ring-blue-400/50
+                       disabled:opacity-50 disabled:cursor-not-allowed"
           />
 
           <input
@@ -76,9 +102,11 @@ const Signup = () => {
             value={formData.email}
             onChange={handleChange}
             required
+            disabled={loading}
             className="w-full px-4 py-3 rounded-lg bg-black/40 
                        border border-white/10 text-white placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                       focus:outline-none focus:ring-2 focus:ring-blue-400/50
+                       disabled:opacity-50 disabled:cursor-not-allowed"
           />
 
           <input
@@ -88,18 +116,37 @@ const Signup = () => {
             value={formData.password}
             onChange={handleChange}
             required
+            disabled={loading}
             className="w-full px-4 py-3 rounded-lg bg-black/40 
                        border border-white/10 text-white placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                       focus:outline-none focus:ring-2 focus:ring-blue-400/50
+                       disabled:opacity-50 disabled:cursor-not-allowed"
           />
 
+          {/* Loading Button Logic */}
           <button
             type="submit"
-            className="w-full py-3 rounded-lg bg-orange-500 text-black font-semibold
-                       hover:bg-orange-400 transition-all duration-300
-                       shadow-lg shadow-orange-500/30"
+            disabled={loading}
+            className={`w-full py-3 rounded-lg font-semibold transition-all duration-300
+                       shadow-lg flex items-center justify-center gap-2
+                       ${loading 
+                         ? "bg-zinc-800 cursor-not-allowed text-zinc-500" 
+                         : "bg-orange-500 text-black hover:bg-orange-400 shadow-orange-500/30"
+                       }`}
           >
-            Sign Up
+            {loading ? (
+              <>
+                {/* Framer Motion Spinner */}
+                <motion.div
+                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              "Sign Up"
+            )}
           </button>
         </form>
 
