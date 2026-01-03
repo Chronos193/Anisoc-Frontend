@@ -1,31 +1,19 @@
 import { useState } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Home from './pages/Home'
-import About from './pages/About'
-import Nav from './components/Nav'
-import Footer from './components/Footer'
-import Events from './pages/Events'
-import EventDetail from './pages/EventDetail'
-import Analysis from './pages/Analysis'
-import SeasonalDetail from './pages/SeasonalDetail'
-import FanFictionDetail from './pages/FanFictionDetail'
-import FanFictionList from './pages/FanFictionList'
-import ChapterReader from './pages/ChapterReader'
-import Login from './pages/Login'
-import Signup from './pages/Signup'
-import ProtectedRoutes from './components/Protected_Routes'
-import FanFictionMetaCreatePage from './pages/FanFictionMetaCreatePage'
-import FanFictionMetaEditPage from './pages/FanFictionMetaEditPage'
-import ChapterStudioPage from './pages/ChapterStudioPage'
-import BlogPostDetailPage from './pages/BlogPostDetailPage'
-import BlogListPage from './pages/BlogListPage'
-import BlogCreatePage from './pages/BlogCreatePage'
+// ... all your imports ...
+import ScrollToTop from './components/ScrollToTop'
+
 function App() {
   return (
     <BrowserRouter>
+      {/* ✅ MOVE IT HERE: Inside Router, but outside Routes */}
+      <ScrollToTop />
+      
       <Nav />
 
       <Routes>
+        {/* <ScrollToTop />  ❌ DON'T PUT IT HERE */}
+        
         {/*Login */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -35,7 +23,8 @@ function App() {
         <Route path="/events/:id" element={<EventDetail />} />
         <Route path="/analysis" element={<Analysis />} />
         <Route path="/analysis/seasonal/:id" element={<SeasonalDetail />} />
-         {/* Fanfiction */}
+        
+        {/* Fanfiction */}
         <Route path="/fanfiction" element={<FanFictionList />} />
         <Route path="/fanfiction/:id" element={<FanFictionDetail />} />
         <Route path="/chapters/:id" element={<ChapterReader />} />
@@ -47,7 +36,6 @@ function App() {
             </ProtectedRoutes>
           }
         />
-
         <Route
           path="/fanfiction/:id/edit"
           element={
@@ -56,7 +44,6 @@ function App() {
             </ProtectedRoutes>
           }
         />
-
         <Route
           path="/fanfiction/:id/chapters"
           element={
@@ -65,6 +52,7 @@ function App() {
             </ProtectedRoutes>
           }
         />
+        
         {/* Blogs */}
         <Route path="/blog" element={<BlogListPage />} />
         <Route path="/blog/new" element={<BlogCreatePage />} />

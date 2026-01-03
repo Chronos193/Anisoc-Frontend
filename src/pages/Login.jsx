@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
-import { XCircle, X } from "lucide-react"; // Make sure you have lucide-react installed
+import { XCircle, X } from "lucide-react"; 
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,6 +12,10 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Construct the URL for password reset (using your existing logic)
+  // If you later build a React page for this, change this to a <Link to="/reset">
+  const resetUrl = `${import.meta.env.VITE_API_URL}/auth/password-reset/`;
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -21,7 +25,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError(""); 
     setLoading(true);
 
     try {
@@ -29,7 +33,6 @@ const Login = () => {
       window.dispatchEvent(new Event("auth-changed"));
       navigate("/");
     } catch (err) {
-      // Set the error message to trigger the modal
       setError("Invalid username or password. Please try again.");
     } finally {
       setLoading(false);
@@ -78,17 +81,29 @@ const Login = () => {
                        focus:outline-none focus:ring-2 focus:ring-blue-400/50"
           />
 
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 rounded-lg bg-black/40 
-                       border border-white/10 text-white placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/50"
-          />
+          <div className="space-y-1">
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 rounded-lg bg-black/40 
+                        border border-white/10 text-white placeholder-gray-500
+                        focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+            />
+            
+            {/* --- NEW LOCATION: FORGOT PASSWORD --- */}
+            <div className="flex justify-end">
+              <a 
+                href={resetUrl}
+                className="text-xs text-gray-400 hover:text-orange-400 transition-colors"
+              >
+                Forgot Password?
+              </a>
+            </div>
+          </div>
 
           <button
             type="submit"
@@ -117,9 +132,6 @@ const Login = () => {
 
 // --- MINI COMPONENT: ERROR MODAL ---
 const ErrorModal = ({ message, onClose }) => {
-  // Construct the backend URL for password reset
-  const resetUrl = `${import.meta.env.VITE_API_URL}/auth/password-reset/`;
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       {/* Backdrop */}
@@ -147,23 +159,14 @@ const ErrorModal = ({ message, onClose }) => {
           
           <button 
             onClick={onClose}
-            className="w-full py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors mb-4"
+            className="w-full py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors"
           >
             Try Again
           </button>
-
-          {/* --- FORGOT PASSWORD LINK --- */}
-          <a 
-            href={resetUrl}
-            className="text-sm text-gray-500 hover:text-white transition-colors underline decoration-gray-700 underline-offset-4"
-          >
-            Forgot your password?
-          </a>
-
         </div>
       </div>
     </div>
   );
 };
 
-export default Login
+export default Login;
