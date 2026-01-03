@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // Import AnimatePresence
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -11,9 +11,17 @@ const Signup = () => {
     password: "",
   });
   
-  // New State for Loading
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // NEW: Track if password field is focused
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  // NEW: Simple frontend validation checks
+  const validations = {
+    length: formData.password.length >= 8,
+    notNumeric: isNaN(formData.password) && formData.password !== "", // Simple check to ensure it's not just numbers
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -25,29 +33,24 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true); // 1. Start Loading
+    setLoading(true);
 
     try {
       await api.post("/auth/register/", formData);
-      // Optional: You could show a "Success" message here before navigating
       navigate("/login");
     } catch (err) {
       console.error("Signup Error:", err);
-      
-      // 2. Smart Error Extraction
-      // Django returns errors like: { "password": ["Too common"], "username": ["Taken"] }
       if (err.response && err.response.data) {
-        // Grab the first error message from the object
         const firstErrorKey = Object.keys(err.response.data)[0];
         const errorMessage = err.response.data[firstErrorKey][0];
-        
-        // Make it readable (e.g., "Password: This password is too common.")
-        setError(`${firstErrorKey.charAt(0).toUpperCase() + firstErrorKey.slice(1)}: ${errorMessage}`);
+        // Capitalize key
+        const keyName = firstErrorKey.charAt(0).toUpperCase() + firstErrorKey.slice(1);
+        setError(`${keyName}: ${errorMessage}`);
       } else {
         setError("Something went wrong. Please try again.");
       }
     } finally {
-      setLoading(false); // 3. Stop Loading (always runs)
+      setLoading(false);
     }
   };
 
@@ -71,7 +74,6 @@ const Signup = () => {
           Create your account
         </p>
 
-        {/* Dynamic Error Message */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 mb-4">
              <p className="text-red-400 text-sm text-center font-medium">
@@ -88,11 +90,10 @@ const Signup = () => {
             value={formData.username}
             onChange={handleChange}
             required
-            disabled={loading} // Disable input while loading
+            disabled={loading}
             className="w-full px-4 py-3 rounded-lg bg-black/40 
                        border border-white/10 text-white placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/50
-                       disabled:opacity-50 disabled:cursor-not-allowed"
+                       focus:outline-none focus:ring-2 focus:ring-blue-400/50"
           />
 
           <input
@@ -105,25 +106,54 @@ const Signup = () => {
             disabled={loading}
             className="w-full px-4 py-3 rounded-lg bg-black/40 
                        border border-white/10 text-white placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/50
-                       disabled:opacity-50 disabled:cursor-not-allowed"
+                       focus:outline-none focus:ring-2 focus:ring-blue-400/50"
           />
 
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            disabled={loading}
-            className="w-full px-4 py-3 rounded-lg bg-black/40 
-                       border border-white/10 text-white placeholder-gray-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-400/50
-                       disabled:opacity-50 disabled:cursor-not-allowed"
-          />
+          <div className="relative">
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              onFocus={() => setIsPasswordFocused(true)}
+              onBlur={() => setIsPasswordFocused(false)}
+              required
+              disabled={loading}
+              className="w-full px-4 py-3 rounded-lg bg-black/40 
+                        border border-white/10 text-white placeholder-gray-500
+                        focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+            />
 
-          {/* Loading Button Logic */}
+            {/* PASSWORD STRENGTH POPUP */}
+            <AnimatePresence>
+              {isPasswordFocused && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-full left-0 right-0 mt-2 p-3 rounded-lg bg-zinc-900/90 border border-white/10 backdrop-blur-md z-10"
+                >
+                  <p className="text-xs text-gray-400 mb-2 font-semibold uppercase tracking-wider">
+                    Password Requirements:
+                  </p>
+                  <ul className="space-y-1">
+                    <RequirementItem met={validations.length}>
+                      At least 8 characters
+                    </RequirementItem>
+                    <RequirementItem met={validations.notNumeric}>
+                      Can't be entirely numeric
+                    </RequirementItem>
+                    <li className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+                      Not a common password (e.g. 123456)
+                    </li>
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -136,7 +166,6 @@ const Signup = () => {
           >
             {loading ? (
               <>
-                {/* Framer Motion Spinner */}
                 <motion.div
                   className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                   animate={{ rotate: 360 }}
@@ -160,5 +189,13 @@ const Signup = () => {
     </div>
   );
 };
+
+// Helper Component for the list items
+const RequirementItem = ({ met, children }) => (
+  <li className={`flex items-center gap-2 text-xs transition-colors duration-200 ${met ? "text-green-400" : "text-gray-500"}`}>
+    <span className={`w-1.5 h-1.5 rounded-full ${met ? "bg-green-400 shadow-[0_0_5px_rgba(74,222,128,0.5)]" : "bg-gray-500"}`} />
+    {children}
+  </li>
+);
 
 export default Signup;
